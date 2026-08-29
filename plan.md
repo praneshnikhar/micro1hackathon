@@ -49,75 +49,75 @@ macro1/
 
 ## Phase 0 — Scaffold (30 min)
 
-- [ ] `uv init`, pyproject with `[project.scripts] spaceward = "spaceward.cli:main"`
-- [ ] git init, first commit (baseline for the changelog)
-- [ ] Decide LLM provider default: Claude API via env key; `--provider heuristic` runs the full pipeline with zero LLM calls (deterministic judge runs)
-- [ ] Config file `~/.spaceward/config.toml`: threshold %, watch interval, quarantine dir, allow/deny lists
+- [x] `uv init`, pyproject with `[project.scripts] spaceward = "spaceward.cli:main"`
+- [x] git init, first commit (baseline for the changelog)
+- [x] Decide LLM provider default: Claude API via env key; `--provider heuristic` runs the full pipeline with zero LLM calls (deterministic judge runs)
+- [x] Config file `~/.spaceward/config.toml`: threshold %, watch interval, quarantine dir, allow/deny lists
 
 **Done when:** `spaceward --help` works from a clean clone.
 
 ## Phase 1 — Scout + differential ledger (the core differentiator) (2–3 h)
 
-- [ ] `scout.py`: read `df` free space; walk high-yield roots (home, ~/Library, ~/coding2, common cache roots) with size caps and time budget; emit a manifest: `path, bytes, mtime, kind-guess`
-- [ ] `ledger.py`: store manifests as JSONL under `~/.spaceward/manifests/`; diff two manifests → *added / grown / stable* paths since last good state
-- [ ] Crisis framing output: "5.2GB appeared in the last 3 days across 3 paths" — the question no scanner answers
-- [ ] Scan is strictly read-only; heavy walk uses `os.scandir`, skip symlinks, respect macOS permission errors gracefully
+- [x] `scout.py`: read `df` free space; walk high-yield roots (home, ~/Library, ~/coding2, common cache roots) with size caps and time budget; emit a manifest: `path, bytes, mtime, kind-guess`
+- [x] `ledger.py`: store manifests as JSONL under `~/.spaceward/manifests/`; diff two manifests → *added / grown / stable* paths since last good state
+- [x] Crisis framing output: "5.2GB appeared in the last 3 days across 3 paths" — the question no scanner answers
+- [x] Scan is strictly read-only; heavy walk uses `os.scandir`, skip symlinks, respect macOS permission errors gracefully
 
 **Done when:** two consecutive runs on this Mac produce a truthful diff; adding a 100MB file shows up as "changed".
 
 ## Phase 2 — Knowledge base + classifier (the "earning the right to delete" layer) (3–4 h)
 
-- [ ] `knowledge.py`: tiered entries for 50+ known paths:
+- [x] `knowledge.py`: tiered entries for 50+ known paths:
   - **SAFE-REGENERABLE**: node_modules (regen: `npm install`), ~/.npm, pip cache, brew cache, DerivedData, .next/__pycache__, old .dmg installers in ~/Downloads
   - **CAUTION**: app caches that may hold state (Spotify offline music, WhatsApp media, JetBrains indexes), venvs (check requirements.txt exists), docker.raw (needs Docker flow)
   - **FORBIDDEN**: user data (Documents/Pictures/Desktop), credentials (~/.ssh, .env, keychains), git objects, active project source
-- [ ] `classify.py`: for each candidate attach evidence: known-rule (tier, regen command), git-activity (last commit age), process check (is owning app running?), last-access mtime, size
-- [ ] Unknown paths → LLM classification with the knowledge base in context; result gets logged back into memory (Phase 6)
+- [x] `classify.py`: for each candidate attach evidence: known-rule (tier, regen command), git-activity (last commit age), process check (is owning app running?), last-access mtime, size
+- [x] Unknown paths → LLM classification with the knowledge base in context; result gets logged back into memory (Phase 6)
 
 **Done when:** every candidate carries a risk tier + evidence line + regeneration cost; the Spotify path classifies CAUTION *because* Spotify is running and cache holds offline data.
 
 ## Phase 3 — Planner + human gate (ground rule 04) (2 h)
 
-- [ ] `plan.py`: stable candidate IDs (`cand-001`…), grouped tiers, sorted by size×safety; proposal = exact path, GiB, tier, evidence, regen cost, proposed action
-- [ ] `gate.py`: low-risk → one batch approval; caution → per-ID approval; forbidden → refused outright, never proposed; irreversible simulator/system ops → typed confirmation phrase
-- [ ] Interactive CLI + `--yes-file` mode (scripted approval for evals and trajectories)
+- [x] `plan.py`: stable candidate IDs (`cand-001`…), grouped tiers, sorted by size×safety; proposal = exact path, GiB, tier, evidence, regen cost, proposed action
+- [x] `gate.py`: low-risk → one batch approval; caution → per-ID approval; forbidden → refused outright, never proposed; irreversible simulator/system ops → typed confirmation phrase
+- [x] Interactive CLI + `--yes-file` mode (scripted approval for evals and trajectories)
 
 **Done when:** nothing executes without an explicit approved ID; forbidden paths never appear as actionable.
 
 ## Phase 4 — Executor (trash-first, never rm) (1–2 h)
 
-- [ ] `execute.py`: per approved ID: **revalidate exact path identity** (byte-for-byte path + fingerprint vs. plan snapshot), then move to `~/.spaceward/quarantine/` (own trash, restorable via `spaceward restore <id>`), log action to JSONL
-- [ ] Never `rm -rf`; never touch paths outside approved list; running-process check before each move
+- [x] `execute.py`: per approved ID: **revalidate exact path identity** (byte-for-byte path + fingerprint vs. plan snapshot), then move to `~/.spaceward/quarantine/` (own trash, restorable via `spaceward restore <id>`), log action to JSONL
+- [x] Never `rm -rf`; never touch paths outside approved list; running-process check before each move
 
 **Done when:** a scripted end-to-end run on fixture data moves only approved paths, quarantined files are restorable byte-identical.
 
 ## Phase 5 — Verifier + sign-off report (the quality bar) (2 h)
 
-- [ ] `verify.py`: df before/after (honest APFS delta — candidate sizes ≠ recovered space), app health checks (Spotify launches, `npm install --dry-run` passes on touched projects), cache-regen spot check
-- [ ] `report.py`: the artifact a person signs their name to — what changed, why safe, what was verified, GB actually recovered, restored-undo instructions
+- [x] `verify.py`: df before/after (honest APFS delta — candidate sizes ≠ recovered space), app health checks (Spotify launches, `npm install --dry-run` passes on touched projects), cache-regen spot check
+- [x] `report.py`: the artifact a person signs their name to — what changed, why safe, what was verified, GB actually recovered, restored-undo instructions
 
 **Done when:** a full run on this Mac yields a report where every deleted path has evidence + verification result.
 
 ## Phase 6 — Memory (rubric: carries information forward) (1–2 h)
 
-- [ ] `memory.py`: persistent accept/reject ledger per path-pattern; auto-skip previously rejected paths in future plans ("you rejected ~/Music twice — not proposing again"); learned classifications from Phase 2 cache here
-- [ ] `spaceward memory show|forget` for transparency
+- [x] `memory.py`: persistent accept/reject ledger per path-pattern; auto-skip previously rejected paths in future plans ("you rejected ~/Music twice — not proposing again"); learned classifications from Phase 2 cache here
+- [x] `spaceward memory show|forget` for transparency
 
 **Done when:** a rejected candidate never re-proposes; verdict survives restarts.
 
 ## Phase 7 — Watch mode (the "preventive" in guardian) (1 h)
 
-- [ ] `spaceward watch`: poll df every N min; on free-space < threshold (default 10%) → trigger the loop
-- [ ] Demo path: manual `spaceward run --simulate-threshold` so judges reproduce the trigger deterministically
+- [x] `spaceward watch`: poll df every N min; on free-space < threshold (default 10%) → trigger the loop
+- [x] Demo path: manual `spaceward run --simulate-threshold` so judges reproduce the trigger deterministically
 
 **Done when:** lowering the threshold triggers a full run end-to-end.
 
 ## Phase 8 — Baselines + eval harness (measured improvement, 15 pts) (3–4 h)
 
-- [ ] **B1 manual:** document this morning's real session (3.2→7.7GB, ~20 min) as the human baseline
-- [ ] **B2 naive script:** `clean.sh` — find top `du` offenders, `rm -rf` known dir names. Fast, blind
-- [ ] **B3 basic agent:** one general-purpose prompt + basic shell tools, no ledger/gates/verification
-- [ ] `eval/cases.py`: 10+ cases on identical fixture state, including traps:
+- [x] **B1 manual:** document this morning's real session (3.2→7.7GB, ~20 min) as the human baseline
+- [x] **B2 naive script:** `clean.sh` — find top `du` offenders, `rm -rf` known dir names. Fast, blind
+- [x] **B3 basic agent:** one general-purpose prompt + basic shell tools, no ledger/gates/verification
+- [x] `eval/cases.py`: 10+ cases on identical fixture state, including traps:
   1. Spotify-style cache holding offline app data (the lived trap)
   2. node_modules in git-*active* project vs dormant one
   3. venv with requirements.txt present (recoverable) vs. orphaned
@@ -126,26 +126,26 @@ macro1/
   6. macOS "System Data" gray zone
   7. App-support dir shared by two apps
   8–10+. benign standards: old installers, pip/npm caches, build artifacts
-- [ ] `eval/harness.py`: same cases through B1/B2/B3/Spaceward; score = **safe GB reclaimed with zero integrity failures**, human time per task, false-positive deletions, cost per task (brief's table format)
+- [x] `eval/harness.py`: same cases through B1/B2/B3/Spaceward; score = **safe GB reclaimed with zero integrity failures**, human time per task, false-positive deletions, cost per task (brief's table format)
 
 **Done when:** results/ holds one JSON + one comparison table per baseline, same cases, one trap case where B2/B3 demonstrably break something and Spaceward doesn't.
 
 ## Phase 9 — Changelog with real evidence (15 pts) (1 h, ongoing)
 
-- [ ] `CHANGELOG.md`: baseline → v0.1 naive script (fails traps: knowing paths ≠ knowing safety) → v0.2 knowledge base → v0.3 differential ledger → v0.4 approval gate → v0.5 memory+verification → final; each entry = tried/why, measured result (same harness), decision
-- [ ] Identify the single biggest contributor; document at least one removed experiment + what it taught
+- [x] `CHANGELOG.md`: baseline → v0.1 naive script (fails traps: knowing paths ≠ knowing safety) → v0.2 knowledge base → v0.3 differential ledger → v0.4 approval gate → v0.5 memory+verification → final; each entry = tried/why, measured result (same harness), decision
+- [x] Identify the single biggest contributor; document at least one removed experiment + what it taught
 
 ## Phase 10 — Reproducibility + video + trajectories (15 + 5 pts) (3 h)
 
-- [ ] `REPRODUCTION.md`: clean-env setup (uv, API key optional via heuristic mode), exact commands for B1/B2/B3/solution/eval, pinned versions, fixture seeding, expected outputs, runtime + cost
-- [ ] `trajectories/`: JSONL transcripts — scout phase, an unknown-path LLM classification, a human-gate interaction, one retry/verification event
-- [ ] `video/script.md`: 0:00 problem (99% full disk) → baseline walk → one live run start-to-finish → comparison table → changelog highlights → top contributor + removed experiment
+- [x] `REPRODUCTION.md`: clean-env setup (uv, API key optional via heuristic mode), exact commands for B1/B2/B3/solution/eval, pinned versions, fixture seeding, expected outputs, runtime + cost
+- [x] `trajectories/`: JSONL transcripts — scout phase, an unknown-path LLM classification, a human-gate interaction, one retry/verification event
+- [x] `video/script.md`: 0:00 problem (99% full disk) → baseline walk → one live run start-to-finish → comparison table → changelog highlights → top contributor + removed experiment
 
 ## Phase 11 — Submission polish (1 h)
 
-- [ ] README final: user, bottleneck, value, four-questions framing
-- [ ] Ground-rules audit: sandboxed destructive ops (04), no secrets in repo (08), every claim → evidence file (09), judges can run everything (10)
-- [ ] Tag `v1.0`, package deliverables
+- [x] README final: user, bottleneck, value, four-questions framing
+- [x] Ground-rules audit: sandboxed destructive ops (04), no secrets in repo (08), every claim → evidence file (09), judges can run everything (10)
+- [x] Tag `v1.0`, package deliverables
 
 ---
 
