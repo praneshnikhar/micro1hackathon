@@ -1,0 +1,97 @@
+spawn env SPACEWARD_STATE_DIR=/tmp/gate-demo-state uv run spaceward run --simulate-threshold --execute --roots /tmp/gate-demo
+disk low: 1.8% free — investigating what changed
+
+free space: 1.8% (threshold 10.0%)
+refused (2): never proposed for deletion
+  ref-001  60.0 MB  /private/tmp/gate-demo/Library/Containers/com.docker.docker/Data/vms/0/Docker.raw
+         size=62914560 bytes
+         last_modified=0d ago
+         note=deleting destroys all images without prune; use docker system prune
+         process=Docker not running
+  ref-002  40.0 MB  /private/tmp/gate-demo/Documents/backup-server-key.pem
+         size=41943040 bytes
+         last_modified=0d ago
+         note=secret material
+proposal (8 candidates):
+  cand-001  [ SAFE  ]      40.0 MB  /private/tmp/gate-demo/Downloads/OldInstaller-2.1.dmg
+           size=41943040 bytes
+           last_modified=0d ago
+           regeneration=re-download from vendor
+           note=installer already applied or re-obtainable
+  cand-002  [ SAFE  ]      36.0 MB  /private/tmp/gate-demo/projects/dormant-shop/node_modules
+           size=37748736 bytes
+           last_modified=0d ago
+           regeneration=npm install (or pnpm/yarn install) in the project
+           note=regenerable build artifact
+  cand-003  [ SAFE  ]      35.0 MB  /private/tmp/gate-demo/Library/Caches/pip/wheels.bin
+           size=36700160 bytes
+           last_modified=0d ago
+           regeneration=pip cache purge; redownloaded on install
+  cand-004  [ SAFE  ]      33.0 MB  /private/tmp/gate-demo/Downloads/Tool-bundle.tgz
+           size=34603008 bytes
+           last_modified=0d ago
+           regeneration=re-download from vendor
+           note=installer already applied or re-obtainable
+  cand-005  [CAUTION]      50.0 MB  /private/tmp/gate-demo/Library/Application Support/GrayZoneApp/store.db
+           size=52428800 bytes
+           last_modified=0d ago
+           note=unknown path: no matching rule; defaulting to caution
+  cand-006  [CAUTION]      45.0 MB  /private/tmp/gate-demo/Library/Application Support/SharedKit/shared.dat
+           size=47185920 bytes
+           last_modified=0d ago
+           note=unknown path: no matching rule; defaulting to caution
+  cand-007  [CAUTION]      38.0 MB  /private/tmp/gate-demo/Library/Caches/com.offlinemusic.client/offline.bnk
+           size=39845888 bytes
+           last_modified=0d ago
+           note=unknown path: no matching rule; defaulting to caution
+  cand-008  [CAUTION]      36.0 MB  /private/tmp/gate-demo/projects/active-app/node_modules
+           size=37748736 bytes
+           last_modified=0d ago
+           regeneration=npm install (or pnpm/yarn install) in the project
+           note=project_git_activity=0d ago; active project (commit 0d ago), downgrade for workflow safety
+
+
+SAFE tier — regenerable artifacts (4 items, 144.0 MB):
+  cand-001       40.0 MB  /private/tmp/gate-demo/Downloads/OldInstaller-2.1.dmg
+         regen: re-download from vendor
+  cand-002       36.0 MB  /private/tmp/gate-demo/projects/dormant-shop/node_modules
+         regen: npm install (or pnpm/yarn install) in the project
+  cand-003       35.0 MB  /private/tmp/gate-demo/Library/Caches/pip/wheels.bin
+         regen: pip cache purge; redownloaded on install
+  cand-004       33.0 MB  /private/tmp/gate-demo/Downloads/Tool-bundle.tgz
+         regen: re-download from vendor
+approve ALL 4 SAFE items? [y/N] y
+
+CAUTION — cand-005  50.0 MB  /private/tmp/gate-demo/Library/Application Support/GrayZoneApp/store.db
+   size=52428800 bytes
+   last_modified=0d ago
+   note=unknown path: no matching rule; defaulting to caution
+approve? [y/N/a=approve all remaining caution] n
+
+CAUTION — cand-006  45.0 MB  /private/tmp/gate-demo/Library/Application Support/SharedKit/shared.dat
+   size=47185920 bytes
+   last_modified=0d ago
+   note=unknown path: no matching rule; defaulting to caution
+approve? [y/N/a=approve all remaining caution] n
+
+CAUTION — cand-007  38.0 MB  /private/tmp/gate-demo/Library/Caches/com.offlinemusic.client/offline.bnk
+   size=39845888 bytes
+   last_modified=0d ago
+   note=unknown path: no matching rule; defaulting to caution
+approve? [y/N/a=approve all remaining caution] n
+
+CAUTION — cand-008  36.0 MB  /private/tmp/gate-demo/projects/active-app/node_modules
+   size=37748736 bytes
+   last_modified=0d ago
+   regeneration=npm install (or pnpm/yarn install) in the project
+   note=project_git_activity=0d ago; active project (commit 0d ago), downgrade for workflow safety
+approve? [y/N/a=approve all remaining caution] n
+  cand-001: quarantined -> /private/tmp/gate-demo-state/quarantine/cand-001/OldInstaller-2.1.dmg
+  cand-002: quarantined -> /private/tmp/gate-demo-state/quarantine/cand-002/node_modules
+  cand-003: quarantined -> /private/tmp/gate-demo-state/quarantine/cand-003/wheels.bin
+  cand-004: quarantined -> /private/tmp/gate-demo-state/quarantine/cand-004/Tool-bundle.tgz
+
+quarantined: 144.0 MB (planned)
+df recovered: 37.3 MB — APFS may reclaim asynchronously
+verification: 4/4 passed
+report: /private/tmp/gate-demo-state/reports/20260829-112835-985000.md
