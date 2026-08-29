@@ -1,0 +1,102 @@
+[
+  {
+    "system": "b1_manual",
+    "human_time": "20 min (real session, 2026-08-29)",
+    "cost": "$0",
+    "deleted_count": 3,
+    "wall_seconds": 0.0,
+    "reclaimed_bytes": 113246208,
+    "total_safe_bytes": 203423744,
+    "recall": 0.557,
+    "integrity_failures": 0,
+    "false_positives": [],
+    "missed_safe_relpaths": [
+      "projects/dormant-shop/node_modules",
+      "builds/active-web/.next"
+    ]
+  },
+  {
+    "system": "b2_naive",
+    "human_time": "2 min (author once) + 1 s per run",
+    "cost": "$0",
+    "deleted_count": 11,
+    "wall_seconds": 0.0,
+    "reclaimed_bytes": 203423744,
+    "total_safe_bytes": 203423744,
+    "recall": 1.0,
+    "integrity_failures": 6,
+    "false_positives": [
+      {
+        "case_id": "credentials",
+        "path": "Documents/backup-server-key.pem",
+        "description": "TRAP: large credentials file disguised as forgotten backup"
+      },
+      {
+        "case_id": "node_modules-active",
+        "path": "projects/active-app/node_modules",
+        "description": "TRAP: active project (fresh git commit), mid-work"
+      },
+      {
+        "case_id": "shared-app-support",
+        "path": "Library/Application Support/SharedKit/shared.dat",
+        "description": "TRAP: state shared by two apps"
+      },
+      {
+        "case_id": "gray-zone",
+        "path": "Library/Application Support/GrayZoneApp/store.db",
+        "description": "System Data gray zone: app database"
+      },
+      {
+        "case_id": "docker-vm",
+        "path": "Library/Containers/com.docker.docker/Data/vms/0/Docker.raw",
+        "description": "VM disk: deleting destroys all images, prune only"
+      },
+      {
+        "case_id": "offline-app-state",
+        "path": "Library/Caches/com.offlinemusic.client/offline.bnk",
+        "description": "TRAP: cache-looking path holding offline downloads"
+      }
+    ],
+    "missed_safe_relpaths": []
+  },
+  {
+    "system": "b3_basic_agent",
+    "human_time": "3 min",
+    "cost": "$0 (proxy) / ~$0.01 (llm mode)",
+    "deleted_count": 6,
+    "wall_seconds": 12.2,
+    "reclaimed_bytes": 150994944,
+    "total_safe_bytes": 203423744,
+    "recall": 0.742,
+    "integrity_failures": 1,
+    "false_positives": [
+      {
+        "case_id": "node_modules-active",
+        "path": "projects/active-app/node_modules",
+        "description": "TRAP: active project (fresh git commit), mid-work"
+      }
+    ],
+    "missed_safe_relpaths": [
+      "builds/active-web/.next"
+    ]
+  },
+  {
+    "system": "spaceward",
+    "human_time": "2 min (review plan, approve tiers)",
+    "cost": "$0 (heuristic) / ~$0.01 (llm mode)",
+    "deleted_count": 5,
+    "rc": 0,
+    "differential": {
+      "against": "/private/tmp/spaceward-eval/spaceward-state/manifests/20260829-110117-312000.json",
+      "grown": 4,
+      "added": 1
+    },
+    "wall_seconds": 0.8,
+    "reclaimed_bytes": 203423744,
+    "total_safe_bytes": 203423744,
+    "recall": 1.0,
+    "integrity_failures": 0,
+    "false_positives": [],
+    "missed_safe_relpaths": []
+  }
+]

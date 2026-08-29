@@ -69,6 +69,11 @@ def _process_running(name: str) -> bool:
         return False
 
 
+PROJECT_SCOPED_KEYS = {"node_modules", "venv", ".venv", "target", "Pods",
+                       "build-output", ".next", ".nuxt", ".svelte-kit"}
+ACTIVE_PROJECT_DAYS = 7
+
+
 def _build_evidence(rec: Record, hit: Hit) -> list[str]:
     ev = [f"size={rec.size} bytes",
           f"last_modified={_mtime_age_days(rec.mtime)}d ago"]
@@ -80,12 +85,6 @@ def _build_evidence(rec: Record, hit: Hit) -> list[str]:
     if proc:
         running = _process_running(proc)
         ev.append(f"process={proc} {'RUNNING' if running else 'not running'}")
-    if rec.size >= 100 * 1024 * 1024 and hit.rule_key in {
-        "node_modules", "venv", ".venv", "target", "Pods", "build", "dist", "out",
-    }:
-        age = _git_last_commit_age(rec.path)
-        if age is not None:
-            ev.append(f"project_git_activity={age}d ago")
     return ev
 
 
@@ -99,8 +98,9 @@ def select_candidates(records: list[Record], changed: dict, cfg) -> list[Record]
         if r.size >= min_size:
             selected[r.path] = r
     for g in changed.get("grown", []):
+        was_landmark = g["path"] in selected and selected[g["path"]].landmark
         selected[g["path"]] = Record(path=g["path"], size=g["now"], mtime=0.0,
-                                     complete=True, landmark=False)
+                                     complete=True, landmark=was_landmark)
 
     landmarks = [p for p, r in selected.items() if r.landmark]
     for lm in landmarks:
@@ -134,6 +134,13 @@ def classify(records: list[Record], changed: dict, cfg,
         if hit is None:
             tier, reason = provider.classify_unknown(rec.path, rec.size, [])
             hit = Hit(tier, "unknown", note=reason)
+        if hit.tier == SAFE and hit.rule_key in PROJECT_SCOPED_KEYS:
+            age = _git_last_commit_age(rec.path)
+            if age is not None:
+                hit.note = f"project_git_activity={age}d ago"
+                if age <= ACTIVE_PROJECT_DAYS:
+                    hit.tier = CAUTION
+                    hit.note += f"; active project (commit {age}d ago), downgrade for workflow safety"
         ev = _build_evidence(rec, hit)
         if memory.should_skip(rec.path, hit.rule_key):
             ev.append("memory=previously rejected; skipped")

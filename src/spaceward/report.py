@@ -58,7 +58,7 @@ def build_report(cfg, plan: Plan, executed: list[ExecutedAction], results: list[
     lines.append("Every executed item is recoverable: `spaceward restore <cid>`")
     lines.append("Restore all, then delete the quarantine dir when satisfied.")
 
-    path = cfg.reports_dir / f"{time.strftime('%Y%m%d-%H%M%S')}.md"
+    path = cfg.reports_dir / f"{time.strftime('%Y%m%d-%H%M%S')}-{time.time_ns() % 10**6:06d}.md"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(lines) + "\n")
     return path

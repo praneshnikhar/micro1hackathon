@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import tomllib
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -53,6 +54,11 @@ class Config:
             for key, value in overrides.items():
                 if value is not None:
                     setattr(cfg, key, value)
+        env_state = os.environ.get("SPACEWARD_STATE_DIR")
+        if env_state:
+            cfg.state_dir = expand(env_state)
+            if "quarantine_dir" not in data:
+                cfg.quarantine_dir = cfg.state_dir / "quarantine"
         cfg.state_dir = expand(cfg.state_dir)
         cfg.quarantine_dir = expand(cfg.quarantine_dir)
         return cfg

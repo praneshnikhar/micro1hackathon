@@ -30,6 +30,9 @@ def gate(plan, cfg, yes_file: str | None, execute: bool) -> set[str]:
             unknown = set(approved_raw) - known
             if unknown:
                 print(f"warning: ignoring unknown candidate ids: {sorted(unknown)}", file=sys.stderr)
+        tiers = set(data.get("approve_tiers", [])) if isinstance(data, dict) else set()
+        if tiers:
+            approved |= {c.cid for c in plan.candidates if c.tier in tiers}
         _record_decisions(plan.candidates, approved, Memory(cfg.state_dir))
         return approved
 

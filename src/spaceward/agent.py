@@ -29,7 +29,7 @@ class Trajectory:
 def run_pipeline(cfg, simulate_threshold: bool = False, execute: bool = False,
                  dry_run: bool = False, yes_file: str | None = None,
                  roots: list[str] | None = None) -> int:
-    run_id = time.strftime("%Y%m%d-%H%M%S")
+    run_id = f"{time.strftime('%Y%m%d-%H%M%S')}-{time.time_ns() % 10**6:06d}"
     traj = Trajectory(cfg, run_id)
 
     total, free = disk_usage("/")

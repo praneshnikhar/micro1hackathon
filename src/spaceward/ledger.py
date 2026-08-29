@@ -7,8 +7,12 @@ from .scout import Record
 from .util import expand, read_json, write_json
 
 
+def _stamp() -> str:
+    return f"{time.strftime('%Y%m%d-%H%M%S')}-{time.time_ns() % 10**6:06d}"
+
+
 def save(cfg, records: list[Record], stats: dict) -> Path:
-    path = cfg.manifests_dir / f"{time.strftime('%Y%m%d-%H%M%S')}.json"
+    path = cfg.manifests_dir / f"{_stamp()}.json"
     write_json(path, {"created": time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime()),
                       "stats": stats,
                       "records": [r.__dict__ for r in records]})
